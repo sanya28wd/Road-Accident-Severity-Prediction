@@ -47,6 +47,10 @@ SHAP provides comprehensive model interpretability through game theory-based fea
 - **Feature Interaction Analysis**: Identifies which features work together to influence predictions
 - **SHAP Force Plots**: Interactive decision transparency showing feature values and their directional impact
 
+**SHAP Feature Importance Visualization:**
+
+![SHAP Top 20 Features](modelling/reports/explainability_outputs/shap_top20_bar.png)
+
 **Generated Outputs:**
 - `modelling/reports/explainability_outputs/shap_top20_bar.png` - Feature importance bar chart
 - `modelling/reports/explainability_outputs/shap_force_sample_*.html` - Interactive prediction explanations
@@ -182,17 +186,20 @@ streamlit run user_interface/app.py
 
 ### **Model Evaluation Reports**
 
-**Confusion Matrix:** (`modelling/reports/confusion_matrix.png`)
-- Visual representation of true positives, false positives, true negatives, and false negatives
-- Helps assess model's classification performance across both injury and non-injury categories
+#### **Confusion Matrix**
+Visual representation of true positives, false positives, true negatives, and false negatives. Helps assess model's classification performance across both injury and non-injury categories.
 
-**Feature Importance:** (`modelling/reports/feature_importance_LightGBM.png`)
-- Top predictive features driving accident severity predictions
-- Identifies which traffic, environmental, and vehicle factors matter most
+![Confusion Matrix](modelling/reports/confusion_matrix.png)
 
-**Cross-Validation Metrics:** (`modelling/reports/cross validation metrics comparison.png`)
-- Stratified K-fold cross-validation performance across folds
-- Demonstrates model stability and generalization capability
+#### **Feature Importance (LightGBM)**
+Top predictive features driving accident severity predictions. Identifies which traffic, environmental, and vehicle factors matter most.
+
+![Feature Importance](modelling/reports/feature_importance_LightGBM.png)
+
+#### **Cross-Validation Metrics**
+Stratified K-fold cross-validation performance across folds. Demonstrates model stability and generalization capability.
+
+![Cross Validation Metrics](modelling/reports/cross%20validation%20metrics%20comparison.png)
 
 ---
 ##  Contributors
