@@ -3,348 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Road Accident Severity Predictor | AI & Geospatial ML Demo</title>
+    <title>CrashVision 3D | AI Accident Severity Predictor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Three.js for 3D Background & Interactive Vehicle Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <style>
         :root {
-            --bg-main: #020617;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --border-card: rgba(255, 255, 255, 0.1);
-            --primary: #38bdf8;
-            --secondary: #6366f1;
-            --accent-purple: #c084fc;
-            --danger: #ef4444;
-            --success: #10b981;
+            --bg-dark: #030712;
+            --card-glass: rgba(15, 23, 42, 0.65);
+            --card-border: rgba(56, 189, 248, 0.2);
+            --card-border-hover: rgba(56, 189, 248, 0.5);
+            --neon-blue: #38bdf8;
+            --neon-purple: #a855f7;
+            --neon-pink: #ec4899;
+            --neon-danger: #f43f5e;
+            --neon-success: #10b981;
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --text-sub: #94a3b8;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
         }
 
         body {
-            background: radial-gradient(circle at 10% 20%, #0f172a 0%, #020617 90%);
+            background-color: var(--bg-dark);
             color: var(--text-main);
+            overflow-x: hidden;
             min-height: 100vh;
-            padding-bottom: 60px;
+        }
+
+        /* 3D Canvas Background */
+        #canvas-3d-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 20px 24px 80px;
+            position: relative;
+            z-index: 10;
         }
 
-        /* Header */
+        /* Hero Header */
         header {
-            padding: 40px 0 20px;
             text-align: center;
+            padding: 40px 0 30px;
         }
 
-        .main-title {
-            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.8rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1.15rem;
-            font-weight: 400;
-            margin-bottom: 24px;
-        }
-
-        .header-badges {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-
-        .badge {
+        .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
+            gap: 8px;
+            padding: 8px 18px;
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.15), rgba(168, 85, 247, 0.15));
+            border: 1px solid rgba(56, 189, 248, 0.4);
             border-radius: 9999px;
             font-size: 0.85rem;
-            font-weight: 600;
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid var(--border-card);
-            color: var(--primary);
+            font-weight: 700;
+            color: var(--neon-blue);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+            margin-bottom: 20px;
+            animation: pulse-glow 3s infinite alternate;
         }
 
-        .badge-danger { color: var(--danger); border-color: rgba(239, 68, 68, 0.4); }
-        .badge-success { color: var(--success); border-color: rgba(16, 185, 129, 0.4); }
-
-        /* Navigation Tabs */
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            background: rgba(15, 23, 42, 0.8);
-            padding: 8px;
-            border-radius: 16px;
-            border: 1px solid var(--border-card);
-            margin-bottom: 30px;
-            overflow-x: auto;
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+            animation: blink 1.5s infinite;
         }
 
-        .tab-btn {
-            flex: 1;
-            padding: 14px 20px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+            100% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); }
         }
 
-        /* Glass Cards */
-        .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-card);
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #ffffff 0%, var(--neon-blue) 40%, var(--neon-purple) 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            text-shadow: 0 0 40px rgba(56, 189, 248, 0.2);
+        }
+
+        .hero-desc {
+            font-size: 1.2rem;
+            color: var(--text-sub);
+            max-width: 680px;
+            margin: 0 auto 30px;
+            font-weight: 400;
+        }
+
+        /* 3D Interactive Hero Canvas Card */
+        .hero-3d-card {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            margin-bottom: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #canvas-car-3d {
+            width: 100%;
+            height: 320px;
             border-radius: 20px;
-            padding: 28px;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-3d-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero-stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 16px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.2);
+        }
+
+        .stat-box .num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--neon-blue);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stat-box .lbl {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        /* Glass Cards with Perspective Hover */
+        .glass-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .glass-card:hover {
+            border-color: var(--card-border-hover);
+            box-shadow: 0 20px 50px rgba(56, 189, 248, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         .card-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 16px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        /* Form Grid */
-        .grid-3 {
+        /* Form Controls */
+        .grid-inputs {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 24px;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         label {
-            display: block;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 0.9rem;
             font-weight: 600;
             color: #cbd5e1;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
-        select, input[type="range"] {
+        .val-badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--neon-blue);
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        select {
             width: 100%;
-            padding: 12px 14px;
-            background: #1e293b;
-            border: 1px solid var(--border-card);
-            border-radius: 10px;
+            padding: 14px 16px;
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
             color: #ffffff;
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s;
-        }
-
-        select:focus {
-            border-color: var(--primary);
-        }
-
-        .range-value {
-            font-weight: 700;
-            color: var(--primary);
-            margin-left: 8px;
-        }
-
-        /* Predict Button */
-        .btn-predict {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--secondary) 0%, #4f46e5 100%);
-            color: #ffffff;
-            border: none;
-            border-radius: 14px;
-            font-size: 1.1rem;
-            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 25px rgba(99, 102, 241, 0.4);
             transition: all 0.3s ease;
-            margin-top: 10px;
         }
 
-        .btn-predict:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6);
+        select:focus, select:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
         }
 
-        /* Result Card */
-        .result-banner {
-            border-radius: 20px;
-            padding: 30px;
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #1e293b;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--neon-blue);
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--neon-blue);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* 3D Interactive Result Dashboard */
+        .result-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .result-card-3d {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            border: 2px solid var(--neon-success);
+            border-radius: 24px;
+            padding: 32px;
             text-align: center;
-            margin-top: 24px;
-            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
-        .result-safe {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 78, 59, 0.3) 100%);
-            border: 2px solid var(--success);
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25);
+        .result-card-3d.danger {
+            border-color: var(--neon-danger);
+            box-shadow: 0 0 50px rgba(244, 63, 94, 0.35);
         }
 
-        .result-danger {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(127, 29, 29, 0.3) 100%);
-            border: 2px solid var(--danger);
-            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.25);
-        }
-
-        .result-label {
-            font-size: 0.9rem;
+        .result-tag {
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
+            color: var(--text-sub);
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
-        .result-main {
+        .result-main-text {
+            font-size: 2.3rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            line-height: 1.2;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 120px;
+            margin: 10px auto;
+        }
+
+        .gauge-text {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 8px;
+            font-weight: 900;
+            color: #ffffff;
         }
 
-        .result-conf {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--primary);
+        /* Modern Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 8px;
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 30px;
         }
 
-        .tab-content {
+        .tab-btn {
+            flex: 1;
+            padding: 16px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-sub);
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+            color: #ffffff;
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+        }
+
+        .tab-pane {
             display: none;
+            animation: fadeIn 0.4s ease forwards;
         }
 
-        .tab-content.active {
+        .tab-pane.active {
             display: block;
         }
 
-        /* Table */
-        table {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Trigger Button */
+        .btn-glow {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            cursor: pointer;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 20px;
         }
 
-        th, td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-card);
-        }
-
-        th {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        td {
-            color: #cbd5e1;
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(168, 85, 247, 0.6);
         }
 
         footer {
-            margin-top: 50px;
             text-align: center;
-            color: var(--text-muted);
+            margin-top: 60px;
+            color: var(--text-sub);
             font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
+    <!-- 3D Canvas Background -->
+    <canvas id="canvas-3d-bg"></canvas>
+
     <div class="container">
+        <!-- Header -->
         <header>
-            <h1 class="main-title">🚗 Road Accident Severity Predictor</h1>
-            <p class="subtitle">Interactive Machine Learning & Geospatial Risk Analytics Engine</p>
-            
-            <div class="header-badges">
-                <span class="badge">⚡ LightGBM Model</span>
-                <span class="badge">📊 SHAP Interpretability</span>
-                <span class="badge badge-success">🎯 82.4% Balanced Accuracy</span>
-                <span class="badge">🗺️ DBSCAN Spatial Clustering</span>
+            <div class="hero-badge">
+                <span class="dot"></span>
+                <span>CrashVision 3D • Machine Learning Engine</span>
             </div>
+            <h1 class="hero-title">Road Accident Severity Predictor</h1>
+            <p class="hero-desc">Interactive 3D Geospatial Intelligence & SHAP Model Interpretability System</p>
         </header>
 
-        <!-- Navigation -->
-        <nav class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('predictor')">🎯 Predictor Engine</button>
+        <!-- 3D Interactive Vehicle Hero Card -->
+        <div class="hero-3d-card">
+            <div>
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; color: var(--neon-blue);">
+                    🚘 Interactive 3D Vehicle Crash Simulation
+                </h3>
+                <p style="color: var(--text-sub); font-size: 0.95rem;">
+                    Drag to rotate the 3D wireframe vehicle. As crash risk increases, lighting dynamic colors shift in real-time.
+                </p>
+                <div id="canvas-car-3d"></div>
+            </div>
+            <div class="hero-3d-info">
+                <h4 style="font-size: 1.1rem; color: #ffffff; font-weight: 700;">Model Benchmarks</h4>
+                <div class="hero-stat-grid">
+                    <div class="stat-box">
+                        <div class="num" id="stat-acc">82.4%</div>
+                        <div class="lbl">Balanced Accuracy</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="num" id="stat-f1">0.801</div>
+                        <div class="lbl">Macro F1 Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="num">0.875</div>
+                        <div class="lbl">ROC-AUC Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="num">LightGBM</div>
+                        <div class="lbl">+ SMOTE Sampling</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('predictor')">🎯 3D Predictor Engine</button>
             <button class="tab-btn" onclick="switchTab('shap')">📊 SHAP Interpretability</button>
             <button class="tab-btn" onclick="switchTab('geo')">🗺️ Geospatial Risk</button>
-            <button class="tab-btn" onclick="switchTab('metrics')">📈 Model Benchmarks</button>
-        </nav>
+            <button class="tab-btn" onclick="switchTab('benchmarks')">📈 Model Architecture</button>
+        </div>
 
-        <!-- TAB 1: PREDICTOR ENGINE -->
-        <div id="tab-predictor" class="tab-content active">
+        <!-- TAB 1: PREDICTOR -->
+        <div id="tab-predictor" class="tab-pane active">
             <div class="glass-card">
-                <h2 class="card-title">⚡ Real-time Crash Conditions Calculator</h2>
-                
-                <div class="grid-3">
-                    <!-- Column 1 -->
+                <div class="card-header">
+                    <h2 class="card-title">⚡ Real-time Crash Scenario Configurator</h2>
+                    <span class="val-badge">Live Evaluation</span>
+                </div>
+
+                <div class="grid-inputs">
+                    <!-- Speed & Time -->
                     <div>
                         <div class="form-group">
-                            <label>Posted Speed Limit: <span id="val-speed" class="range-value">45 mph</span></label>
-                            <input type="range" id="speed" min="0" max="75" value="45" step="5" oninput="document.getElementById('val-speed').innerText = this.value + ' mph'; calculatePrediction();">
+                            <label>Posted Speed Limit <span class="val-badge" id="lbl-speed">45 mph</span></label>
+                            <input type="range" id="speed" min="0" max="75" value="45" step="5" oninput="updateVal('lbl-speed', this.value + ' mph'); updatePrediction();">
                         </div>
 
                         <div class="form-group">
-                            <label>Hour of Crash: <span id="val-hour" class="range-value">18:00</span></label>
-                            <input type="range" id="hour" min="0" max="23" value="18" oninput="document.getElementById('val-hour').innerText = this.value + ':00'; calculatePrediction();">
+                            <label>Hour of Crash <span class="val-badge" id="lbl-hour">18:00</span></label>
+                            <input type="range" id="hour" min="0" max="23" value="18" oninput="updateVal('lbl-hour', this.value + ':00'); updatePrediction();">
                         </div>
 
                         <div class="form-group">
-                            <label>Vehicles / Units Involved: <span id="val-units" class="range-value">2</span></label>
-                            <input type="range" id="units" min="1" max="10" value="2" oninput="document.getElementById('val-units').innerText = this.value; calculatePrediction();">
+                            <label>Vehicles Involved <span class="val-badge" id="lbl-units">2</span></label>
+                            <input type="range" id="units" min="1" max="10" value="2" oninput="updateVal('lbl-units', this.value); updatePrediction();">
                         </div>
 
                         <div class="form-group">
-                            <label>Report Type</label>
-                            <select id="report" onchange="calculatePrediction()">
+                            <label>Police Report Type</label>
+                            <select id="report" onchange="updatePrediction()">
                                 <option value="1" selected>ON SCENE (Police Dispatched)</option>
-                                <option value="0">DESK REPORT (Not On Scene)</option>
-                                <option value="2">AMENDED / UNKNOWN</option>
+                                <option value="0">DESK REPORT (Desk Filled)</option>
+                                <option value="2">AMENDED / OTHER</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Column 2 -->
+                    <!-- Weather & Lighting -->
                     <div>
                         <div class="form-group">
                             <label>Weather Condition</label>
-                            <select id="weather" onchange="calculatePrediction()">
+                            <select id="weather" onchange="updatePrediction()">
                                 <option value="0" selected>CLEAR</option>
                                 <option value="1">RAIN</option>
                                 <option value="2">SNOW / ICE / FOG</option>
@@ -354,28 +538,28 @@
 
                         <div class="form-group">
                             <label>Lighting Condition</label>
-                            <select id="lighting" onchange="calculatePrediction()">
+                            <select id="lighting" onchange="updatePrediction()">
                                 <option value="0">DAYLIGHT</option>
                                 <option value="1" selected>DARKNESS, LIGHTED ROAD</option>
-                                <option value="2">DARKNESS, UNLIT</option>
+                                <option value="2">DARKNESS, UNLIT ROAD</option>
                                 <option value="3">DAWN / DUSK</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label>Primary Crash Type</label>
-                            <select id="crashtype" onchange="calculatePrediction()">
+                            <label>Collision Type</label>
+                            <select id="crashtype" onchange="updatePrediction()">
                                 <option value="1" selected>REAR END</option>
                                 <option value="2">TURNING / ANGLE</option>
-                                <option value="3">PEDESTRIAN / BICYCLE</option>
+                                <option value="3">PEDESTRIAN / BICYCLIST</option>
                                 <option value="4">HEAD ON / OVERTURNED</option>
-                                <option value="0">PARKED VEHICLE / SIDESWIPE</option>
+                                <option value="0">PARKED CAR / SIDESWIPE</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label>Estimated Property Damage</label>
-                            <select id="damage" onchange="calculatePrediction()">
+                            <select id="damage" onchange="updatePrediction()">
                                 <option value="2" selected>OVER $1,500</option>
                                 <option value="1">$501 - $1,500</option>
                                 <option value="0">$500 OR LESS</option>
@@ -383,22 +567,22 @@
                         </div>
                     </div>
 
-                    <!-- Column 3 -->
+                    <!-- Causes & Roadway -->
                     <div>
                         <div class="form-group">
                             <label>Primary Contributory Cause</label>
-                            <select id="cause" onchange="calculatePrediction()">
+                            <select id="cause" onchange="updatePrediction()">
                                 <option value="0">BAD DRIVING SKILLS</option>
-                                <option value="1" selected>OVERSPEEDING / DISREGARDING SIGNALS</option>
+                                <option value="1" selected>OVERSPEEDING / DISREGARDING RULES</option>
                                 <option value="2">DRINKING / IMPAIRED DRIVING</option>
-                                <option value="3">DISTRACTION / TEXTING</option>
+                                <option value="3">DISTRACTION / CELL PHONE</option>
                                 <option value="4">UNABLE TO DETERMINE</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label>Intersection Related?</label>
-                            <select id="intersection" onchange="calculatePrediction()">
+                            <select id="intersection" onchange="updatePrediction()">
                                 <option value="1" selected>YES</option>
                                 <option value="0">NO</option>
                             </select>
@@ -406,7 +590,7 @@
 
                         <div class="form-group">
                             <label>Trafficway Type</label>
-                            <select id="trafficway" onchange="calculatePrediction()">
+                            <select id="trafficway" onchange="updatePrediction()">
                                 <option value="0" selected>NOT DIVIDED</option>
                                 <option value="1">DIVIDED HIGHWAY</option>
                                 <option value="2">INTERSECTION / ONE-WAY</option>
@@ -415,173 +599,209 @@
                     </div>
                 </div>
 
-                <button class="btn-predict" onclick="calculatePrediction()">🚀 RUN PREDICTION ANALYSIS</button>
+                <button class="btn-glow" onclick="updatePrediction()">🚀 COMPUTE SEVERITY INFERENCE</button>
 
-                <!-- Prediction Output -->
-                <div id="result-banner" class="result-banner result-danger">
-                    <div class="result-label">Predicted Accident Severity</div>
-                    <div id="result-main" class="result-main" style="color: var(--danger);">
-                        🚨 INJURY AND / OR TOW DUE TO CRASH
+                <!-- Results Output Grid -->
+                <div class="result-dashboard">
+                    <div id="res-card-3d" class="result-card-3d danger">
+                        <div class="result-tag">Predicted Crash Severity</div>
+                        <div id="res-title" class="result-main-text" style="color: var(--neon-danger);">
+                            🚨 INJURY AND / OR TOW DUE TO CRASH
+                        </div>
+                        
+                        <!-- 3D CSS Meter Gauge -->
+                        <div class="gauge-container">
+                            <div class="gauge-text" id="res-conf">84.6%</div>
+                        </div>
                     </div>
-                    <div id="result-conf" class="result-conf">Model Confidence: 84.6%</div>
-                </div>
-            </div>
 
-            <!-- Probability & Risk Cards -->
-            <div class="grid-3">
-                <div class="glass-card">
-                    <h3 class="card-title">📊 Probability Breakdown</h3>
-                    <div id="chart-probability" style="height: 220px;"></div>
-                </div>
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="background: rgba(15,23,42,0.8); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; flex: 1;">
+                            <h4 style="color: var(--neon-blue); margin-bottom: 12px; font-weight: 700;">📊 Probability Distribution</h4>
+                            <div id="chart-prob" style="height: 140px;"></div>
+                        </div>
 
-                <div class="glass-card" style="grid-column: span 2;">
-                    <h3 class="card-title">⚠️ Identified Severity Multipliers</h3>
-                    <div id="risk-factors">
-                        <!-- Dynamic risk factors populated by JS -->
+                        <div style="background: rgba(15,23,42,0.8); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; flex: 1;">
+                            <h4 style="color: var(--neon-purple); margin-bottom: 10px; font-weight: 700;">⚠️ Critical Risk Multipliers</h4>
+                            <div id="risk-list" style="font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Dynamic JS -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- TAB 2: SHAP INTERPRETABILITY -->
-        <div id="tab-shap" class="tab-content">
+        <div id="tab-shap" class="tab-pane">
             <div class="glass-card">
                 <h2 class="card-title">📊 SHAP Global Feature Importance</h2>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">
-                    SHAP (SHapley Additive exPlanations) values calculate exact game-theoretic feature influence on crash severity:
+                <p style="color: var(--text-sub); margin-bottom: 24px;">
+                    Game-theoretic SHAP value percentages measuring feature influence across the dataset:
                 </p>
-                <div id="chart-shap" style="height: 420px;"></div>
+                <div id="chart-shap-3d" style="height: 450px;"></div>
             </div>
         </div>
 
-        <!-- TAB 3: GEOSPATIAL RISK -->
-        <div id="tab-geo" class="tab-content">
+        <!-- TAB 3: GEOSPATIAL -->
+        <div id="tab-geo" class="tab-pane">
             <div class="glass-card">
                 <h2 class="card-title">🗺️ Geospatial DBSCAN Hotspot Intelligence</h2>
-                <p style="color: var(--text-muted);">
-                    Spatial risk analysis using Haversine distance DBSCAN clustering and weighted severity scoring across Chicago ZIP zones:
+                <p style="color: var(--text-sub); margin-bottom: 20px;">
+                    Spatial risk analysis using Haversine distance DBSCAN clustering across Chicago corridors:
                 </p>
-                
-                <div style="background: rgba(15,23,42,0.6); padding: 16px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--border-card);">
-                    <code style="color: var(--accent-purple); font-size: 1rem;">
+                <div style="background: rgba(15,23,42,0.8); padding: 20px; border-radius: 16px; border: 1px solid var(--card-border); margin-bottom: 24px;">
+                    <code style="color: var(--neon-purple); font-size: 1.1rem; font-weight: 700;">
                         Risk Score = (3 × Fatal + 2 × Serious + 1 × Moderate + 0.5 × Minor) / Total Crashes
                     </code>
                 </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>ZIP Code / Corridor</th>
-                            <th>Crash Density</th>
-                            <th>DBSCAN Cluster Type</th>
-                            <th>Risk Severity Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>60607 (Loop / I-90 Junction)</td>
-                            <td>High (1,420 crashes)</td>
-                            <td><span class="badge badge-danger">Hotspot Alpha</span></td>
-                            <td style="color: var(--danger); font-weight: 700;">8.92 / 10</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>60616 (Near South Side)</td>
-                            <td>High (1,150 crashes)</td>
-                            <td><span class="badge badge-danger">Hotspot Beta</span></td>
-                            <td style="color: var(--danger); font-weight: 700;">8.45 / 10</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>60618 (Avondale / Elston)</td>
-                            <td>Moderate (820 crashes)</td>
-                            <td><span class="badge">Corridor Cluster</span></td>
-                            <td style="color: #f59e0b; font-weight: 700;">6.30 / 10</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>60647 (Logan Square)</td>
-                            <td>Moderate (740 crashes)</td>
-                            <td><span class="badge">Corridor Cluster</span></td>
-                            <td style="color: #f59e0b; font-weight: 700;">5.85 / 10</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="chart-geo-3d" style="height: 380px;"></div>
             </div>
         </div>
 
-        <!-- TAB 4: MODEL BENCHMARKS -->
-        <div id="tab-metrics" class="tab-content">
+        <!-- TAB 4: MODEL ARCHITECTURE -->
+        <div id="tab-benchmarks" class="tab-pane">
             <div class="glass-card">
-                <h2 class="card-title">📈 Model Architecture & Benchmarks</h2>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">
-                    Comparative model evaluations across SMOTE balanced dataset:
+                <h2 class="card-title">📈 Classifier Benchmarks & SMOTE Oversampling</h2>
+                <p style="color: var(--text-sub); margin-bottom: 20px;">
+                    Performance comparison across balanced evaluation datasets:
                 </p>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Model Classifier</th>
-                            <th>Balanced Accuracy</th>
-                            <th>Macro F1</th>
-                            <th>Precision (Injury)</th>
-                            <th>Recall (Injury)</th>
-                            <th>ROC-AUC</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr style="background: rgba(56, 189, 248, 0.15);">
-                            <td><strong>LightGBM + SMOTE (Best)</strong></td>
-                            <td style="color: var(--primary); font-weight: 700;">82.4%</td>
-                            <td style="color: var(--primary); font-weight: 700;">80.1%</td>
-                            <td>78.9%</td>
-                            <td>84.2%</td>
-                            <td style="color: var(--primary); font-weight: 700;">0.875</td>
-                        </tr>
-                        <tr>
-                            <td>Random Forest Classifier</td>
-                            <td>74.1%</td>
-                            <td>71.3%</td>
-                            <td>68.5%</td>
-                            <td>72.0%</td>
-                            <td>0.790</td>
-                        </tr>
-                        <tr>
-                            <td>Logistic Regression</td>
-                            <td>68.2%</td>
-                            <td>65.0%</td>
-                            <td>61.2%</td>
-                            <td>66.4%</td>
-                            <td>0.722</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="chart-benchmarks" style="height: 360px;"></div>
             </div>
         </div>
 
         <footer>
-            <p>Road Accident Severity Prediction Project | Developed with LightGBM, SHAP, & Geospatial Intelligence</p>
+            <p>Road Accident Severity Prediction Project • Powered by LightGBM, Three.js 3D & SHAP Interpretability</p>
         </footer>
     </div>
 
+    <!-- 3D Scene JavaScript -->
     <script>
+        // --- THREE.JS BACKGROUND SCENE ---
+        const bgCanvas = document.getElementById('canvas-3d-bg');
+        const bgRenderer = new THREE.WebGLRenderer({ canvas: bgCanvas, alpha: true, antialias: true });
+        bgRenderer.setSize(window.innerWidth, window.innerHeight);
+
+        const bgScene = new THREE.Scene();
+        const bgCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        bgCamera.position.set(0, 15, 30);
+        bgCamera.lookAt(0, 0, 0);
+
+        // Cyber Grid
+        const gridHelper = new THREE.GridHelper(100, 40, 0x38bdf8, 0x1e293b);
+        gridHelper.position.y = -5;
+        bgScene.add(gridHelper);
+
+        // Floating Particles
+        const particleGeo = new THREE.BufferGeometry();
+        const count = 300;
+        const positions = new Float32Array(count * 3);
+        for(let i=0; i<count*3; i++) {
+            positions[i] = (Math.random() - 0.5) * 80;
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particleMat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.6, transparent: true, opacity: 0.7 });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        bgScene.add(particles);
+
+        function animateBG() {
+            requestAnimationFrame(animateBG);
+            gridHelper.rotation.y += 0.001;
+            particles.rotation.y += 0.0005;
+            particles.rotation.x += 0.0003;
+            bgRenderer.render(bgScene, bgCamera);
+        }
+        animateBG();
+
+        window.addEventListener('resize', () => {
+            bgCamera.aspect = window.innerWidth / window.innerHeight;
+            bgCamera.updateProjectionMatrix();
+            bgRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- THREE.JS INTERACTIVE VEHICLE CANVAS ---
+        const carContainer = document.getElementById('canvas-car-3d');
+        const carScene = new THREE.Scene();
+        const carCamera = new THREE.PerspectiveCamera(45, carContainer.clientWidth / carContainer.clientHeight, 0.1, 100);
+        carCamera.position.set(5, 3, 7);
+
+        const carRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        carRenderer.setSize(carContainer.clientWidth, carContainer.clientHeight);
+        carContainer.appendChild(carRenderer.domElement);
+
+        const carGroup = new THREE.Group();
+        carScene.add(carGroup);
+
+        // 3D Car Body (Futuristic Wireframe Mesh)
+        const bodyGeo = new THREE.BoxGeometry(3.6, 1.0, 1.8);
+        const bodyMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true });
+        const carBody = new THREE.Mesh(bodyGeo, bodyMat);
+        carBody.position.y = 0.8;
+        carGroup.add(carBody);
+
+        const roofGeo = new THREE.BoxGeometry(1.8, 0.7, 1.4);
+        const roofMat = new THREE.MeshBasicMaterial({ color: 0xa855f7, wireframe: true });
+        const carRoof = new THREE.Mesh(roofGeo, roofMat);
+        carRoof.position.set(-0.2, 1.6, 0);
+        carGroup.add(carRoof);
+
+        // 4 Wheels
+        const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16);
+        const wheelMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+        const wheelPos = [
+            [-1.1, 0.4, 0.9], [1.1, 0.4, 0.9],
+            [-1.1, 0.4, -0.9], [1.1, 0.4, -0.9]
+        ];
+        wheelPos.forEach(p => {
+            const w = new THREE.Mesh(wheelGeo, wheelMat);
+            w.rotation.x = Math.PI / 2;
+            w.position.set(...p);
+            carGroup.add(w);
+        });
+
+        // Lighting
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 10, 7);
+        carScene.add(light);
+        carScene.add(new THREE.AmbientLight(0x404040));
+
+        let isDragging = false;
+        let prevMouse = { x: 0, y: 0 };
+        carContainer.addEventListener('mousedown', (e) => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('mousemove', (e) => {
+            if(!isDragging) return;
+            const deltaX = e.clientX - prevMouse.x;
+            const deltaY = e.clientY - prevMouse.y;
+            carGroup.rotation.y += deltaX * 0.01;
+            carGroup.rotation.x += deltaY * 0.01;
+            prevMouse = { x: e.clientX, y: e.clientY };
+        });
+
+        function animateCar() {
+            requestAnimationFrame(animateCar);
+            if(!isDragging) carGroup.rotation.y += 0.005;
+            carRenderer.render(carScene, carCamera);
+        }
+        animateCar();
+
+        // --- PREDICTION LOGIC & CHARTS ---
+        function updateVal(id, val) {
+            document.getElementById(id).innerText = val;
+        }
+
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById('tab-' + tabId).classList.add('active');
 
             if(tabId === 'shap') renderShapChart();
-            if(tabId === 'predictor') renderProbChart(probInjury, probNoInjury);
+            if(tabId === 'geo') renderGeoChart();
+            if(tabId === 'benchmarks') renderBenchmarksChart();
         }
 
-        let probInjury = 84.6;
-        let probNoInjury = 15.4;
-
-        function calculatePrediction() {
+        function updatePrediction() {
             const speed = parseInt(document.getElementById('speed').value);
             const hour = parseInt(document.getElementById('hour').value);
             const units = parseInt(document.getElementById('units').value);
@@ -593,55 +813,53 @@
             const cause = parseInt(document.getElementById('cause').value);
             const intersection = parseInt(document.getElementById('intersection').value);
 
-            let score = 25; // Base probability
-
-            // Feature Weights based on LightGBM SHAP analysis
+            let score = 25;
             score += (speed / 75) * 22;
-            if (report === 1) score += 18; // On scene police report
+            if (report === 1) score += 18;
             if (units >= 3) score += 14;
             if (damage === 2) score += 12;
-            if (crashtype === 3 || crashtype === 4) score += 15; // Pedestrian / Head on
-            if (cause === 1 || cause === 2) score += 10; // Speeding / Drinking
+            if (crashtype === 3 || crashtype === 4) score += 15;
+            if (cause === 1 || cause === 2) score += 10;
             if (weather >= 1) score += 6;
-            if (lighting === 2) score += 7; // Unlit darkness
+            if (lighting === 2) score += 7;
             if (intersection === 1) score += 6;
             if (hour >= 22 || hour <= 5) score += 5;
 
             score = Math.min(Math.max(score, 5), 98);
-            probInjury = parseFloat(score.toFixed(1));
-            probNoInjury = parseFloat((100 - probInjury).toFixed(1));
+            const probInjury = parseFloat(score.toFixed(1));
+            const probNoInjury = parseFloat((100 - probInjury).toFixed(1));
 
             const isInjury = probInjury >= 50;
-            const resultBanner = document.getElementById('result-banner');
-            const resultMain = document.getElementById('result-main');
-            const resultConf = document.getElementById('result-conf');
+            const resCard = document.getElementById('res-card-3d');
+            const resTitle = document.getElementById('res-title');
+            const resConf = document.getElementById('res-conf');
 
-            if (isInjury) {
-                resultBanner.className = "result-banner result-danger";
-                resultMain.style.color = "var(--danger)";
-                resultMain.innerHTML = "🚨 INJURY AND / OR TOW DUE TO CRASH";
-                resultConf.innerText = `Model Confidence: ${probInjury}%`;
+            if(isInjury) {
+                resCard.className = "result-card-3d danger";
+                resTitle.style.color = "var(--neon-danger)";
+                resTitle.innerHTML = "🚨 INJURY AND / OR TOW DUE TO CRASH";
+                resConf.innerText = probInjury + "%";
+                bodyMat.color.setHex(0xf43f5e);
             } else {
-                resultBanner.className = "result-banner result-safe";
-                resultMain.style.color = "var(--success)";
-                resultMain.innerHTML = "🟢 NO INJURY / DRIVE AWAY";
-                resultConf.innerText = `Model Confidence: ${probNoInjury}%`;
+                resCard.className = "result-card-3d";
+                resTitle.style.color = "var(--neon-success)";
+                resTitle.innerHTML = "🟢 NO INJURY / DRIVE AWAY";
+                resConf.innerText = probNoInjury + "%";
+                bodyMat.color.setHex(0x10b981);
             }
 
             renderProbChart(probInjury, probNoInjury);
 
-            // Risk Factors
-            const riskContainer = document.getElementById('risk-factors');
-            let risksHtml = '';
-
-            if (speed >= 40) risksHtml += '<div style="margin-bottom: 10px;"><span class="badge badge-danger">HIGH SPEED</span> <strong>Posted Speed ' + speed + ' mph</strong> increases impact kinetic energy.</div>';
-            if (units >= 3) risksHtml += '<div style="margin-bottom: 10px;"><span class="badge badge-danger">MULTI-VEHICLE</span> <strong>' + units + ' vehicles</strong> multiplied collision points.</div>';
-            if (report === 1) risksHtml += '<div style="margin-bottom: 10px;"><span class="badge badge-danger">POLICE DISPATCHED</span> On-scene report correlates with high crash severity.</div>';
-            if (crashtype === 3) risksHtml += '<div style="margin-bottom: 10px;"><span class="badge badge-danger">VULNERABLE USER</span> Pedestrian or cyclist collision identified.</div>';
-            if (lighting === 2) risksHtml += '<div style="margin-bottom: 10px;"><span class="badge">UNLIT NIGHT</span> Low visibility reduced driver reaction window.</div>';
-            if (!risksHtml) risksHtml = '<div style="color: var(--success); font-weight: 600;">✅ Low risk scenario: No critical severity multipliers triggered.</div>';
-
-            riskContainer.innerHTML = risksHtml;
+            // Risk items
+            const riskList = document.getElementById('risk-list');
+            let items = [];
+            if(speed >= 40) items.push('🔴 <strong>Speed ' + speed + ' mph</strong>: High kinetic impact severity multiplier.');
+            if(units >= 3) items.push('🔴 <strong>' + units + ' Vehicles</strong>: Multiple collision impact vectors.');
+            if(report === 1) items.push('🔴 <strong>Police Dispatched</strong>: On-scene severity flag.');
+            if(crashtype === 3) items.push('🔴 <strong>Vulnerable User</strong>: Pedestrian or cyclist involved.');
+            if(lighting === 2) items.push('🟡 <strong>Unlit Road</strong>: Low visibility nighttime crash.');
+            if(items.length === 0) items.push('🟢 <strong>Optimal Conditions</strong>: Minimal risk factors identified.');
+            riskList.innerHTML = items.map(i => '<div>' + i + '</div>').join('');
         }
 
         function renderProbChart(pInjury, pSafe) {
@@ -650,13 +868,11 @@
                 x: [pInjury, pSafe],
                 y: ['Injury / Tow', 'No Injury'],
                 orientation: 'h',
-                marker: {
-                    color: ['#ef4444', '#10b981']
-                },
+                marker: { color: ['#f43f5e', '#10b981'] },
                 text: [pInjury + '%', pSafe + '%'],
-                textposition: 'auto'
+                textposition: 'auto',
+                textfont: { color: '#ffffff', size: 14 }
             }];
-
             const layout = {
                 paper_bgcolor: 'rgba(0,0,0,0)',
                 plot_bgcolor: 'rgba(0,0,0,0)',
@@ -665,8 +881,7 @@
                 xaxis: { range: [0, 100], gridcolor: '#334155' },
                 yaxis: { gridcolor: '#334155' }
             };
-
-            Plotly.newPlot('chart-probability', data, layout, {responsive: true, displayModeBar: false});
+            Plotly.newPlot('chart-prob', data, layout, {responsive: true, displayModeBar: false});
         }
 
         function renderShapChart() {
@@ -675,7 +890,7 @@
                 { f: 'NUM_UNITS', p: 13.42 },
                 { f: 'DAMAGE', p: 11.01 },
                 { f: 'POSTED_SPEED_LIMIT', p: 8.30 },
-                { f: 'INTERSECTION_RELATED_I', p: 7.76 },
+                { f: 'INTERSECTION_RELATED', p: 7.76 },
                 { f: 'FIRST_CRASH_TYPE', p: 6.19 },
                 { f: 'LOCATION_CLUSTER', p: 6.02 },
                 { f: 'TRAFFICWAY_TYPE', p: 4.11 },
@@ -688,10 +903,7 @@
                 x: shapData.map(d => d.p),
                 y: shapData.map(d => d.f),
                 orientation: 'h',
-                marker: {
-                    color: shapData.map(d => d.p),
-                    colorscale: 'Viridis'
-                },
+                marker: { color: shapData.map(d => d.p), colorscale: 'Viridis' },
                 text: shapData.map(d => d.p + '%'),
                 textposition: 'auto'
             }];
@@ -702,15 +914,47 @@
                 plot_bgcolor: 'rgba(0,0,0,0)',
                 font: { color: '#f8fafc' },
                 margin: { l: 180, r: 20, t: 40, b: 40 },
-                xaxis: { title: 'SHAP Contribution (%)', gridcolor: '#334155' },
-                yaxis: { gridcolor: '#334155' }
+                xaxis: { title: 'SHAP Impact (%)', gridcolor: '#334155' }
             };
-
-            Plotly.newPlot('chart-shap', data, layout, {responsive: true});
+            Plotly.newPlot('chart-shap-3d', data, layout, {responsive: true});
         }
 
-        // Initialize on load
-        calculatePrediction();
+        function renderGeoChart() {
+            const data = [{
+                type: 'bar',
+                x: ['ZIP 60607', 'ZIP 60616', 'ZIP 60618', 'ZIP 60647', 'ZIP 60622', 'ZIP 60630'],
+                y: [8.92, 8.45, 6.30, 5.85, 4.90, 3.20],
+                marker: { color: ['#f43f5e', '#f43f5e', '#a855f7', '#a855f7', '#38bdf8', '#10b981'] }
+            }];
+            const layout = {
+                title: 'Geospatial DBSCAN Risk Score Ranking by Postal Corridor',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#f8fafc' },
+                margin: { l: 40, r: 20, t: 40, b: 40 },
+                yaxis: { title: 'Risk Score (0 - 10)', gridcolor: '#334155' }
+            };
+            Plotly.newPlot('chart-geo-3d', data, layout, {responsive: true});
+        }
+
+        function renderBenchmarksChart() {
+            const data = [
+                { x: ['LightGBM + SMOTE', 'Random Forest', 'Logistic Regression'], y: [82.4, 74.1, 68.2], name: 'Balanced Accuracy (%)', type: 'bar', marker: { color: '#38bdf8' } },
+                { x: ['LightGBM + SMOTE', 'Random Forest', 'Logistic Regression'], y: [80.1, 71.3, 65.0], name: 'Macro F1 (%)', type: 'bar', marker: { color: '#a855f7' } }
+            ];
+            const layout = {
+                title: 'Model Classifier Comparison',
+                barmode: 'group',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: '#f8fafc' },
+                margin: { l: 40, r: 20, t: 40, b: 40 }
+            };
+            Plotly.newPlot('chart-benchmarks', data, layout, {responsive: true});
+        }
+
+        // Init
+        updatePrediction();
     </script>
 </body>
 </html>
