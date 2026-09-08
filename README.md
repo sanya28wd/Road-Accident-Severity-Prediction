@@ -4,7 +4,7 @@
 [![Streamlit UI](https://img.shields.io/badge/Local%20App-Streamlit-ff4b4b?style=for-the-badge&logo=streamlit)](user_interface/app.py)
 [![Model](https://img.shields.io/badge/Model-LightGBM%20%2B%20SMOTE-blue?style=for-the-badge)](modelling/)
 
-🌐 **Live Web Application Demo:** [https://sanya28wd.github.io/Road-Accident-Severity-Prediction/](https://sanya28wd.github.io/Road-Accident-Severity-Prediction/)
+🌐 <u>[Live Web Application Demo](https://sanya28wd.github.io/Road-Accident-Severity-Prediction/)</u>
 
 This repository contains our end-to-end **Road Accident Severity Prediction** project built as part of the Foundations of Data Science coursework. The goal of this project is to build a reliable machine learning pipeline that predicts the severity of a traffic crash and identifies high-risk areas using geospatial intelligence.
 
@@ -125,8 +125,9 @@ Generated outputs:
 - Comprehensive crash risk explorer
 
 ### **User Interface**
-- 🌐 **Live GitHub Pages Web Demo**: [https://sanya28wd.github.io/Road-Accident-Severity-Prediction/](https://sanya28wd.github.io/Road-Accident-Severity-Prediction/)
+- 🌐 <u>[Live GitHub Pages Web Demo](https://sanya28wd.github.io/Road-Accident-Severity-Prediction/)</u>
 - 🎨 **Streamlit Web Application** (`user_interface/app.py`):
+
   - 🎯 Interactive prediction interface for real-time accident severity assessment
   - 📊 Risk factor visualization and feature importance charts
   - 🔍 Model prediction explanations with confidence scores
