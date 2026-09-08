@@ -125,12 +125,14 @@ Generated outputs:
 - Comprehensive crash risk explorer
 
 ### **User Interface**
-**Streamlit Web Application** (`user_interface/app.py`):
-- 🎯 Interactive prediction interface for real-time accident severity assessment
-- 📊 Risk factor visualization and feature importance charts
-- 🔍 Model prediction explanations with confidence scores
-- 🚀 Easy-to-use dashboard for stakeholders and data scientists
-- Pre-trained LightGBM model integrated with feature preprocessing pipeline
+- 🌐 **Live GitHub Pages Web Demo**: [https://sanya28wd.github.io/Road-Accident-Severity-Prediction/](https://sanya28wd.github.io/Road-Accident-Severity-Prediction/)
+- 🎨 **Streamlit Web Application** (`user_interface/app.py`):
+  - 🎯 Interactive prediction interface for real-time accident severity assessment
+  - 📊 Risk factor visualization and feature importance charts
+  - 🔍 Model prediction explanations with confidence scores
+  - 🚀 Easy-to-use dashboard for stakeholders and data scientists
+  - Pre-trained LightGBM model integrated with feature preprocessing pipeline
+
 
 ### **Project Structure**
 
