@@ -6,25 +6,28 @@
     <title>Road Accident Severity Predictor | Modern AI Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
         :root {
-            --bg-base: #090d16;
-            --bg-surface: #0f172a;
-            --bg-surface-elevated: #1e293b;
-            --bg-surface-hover: #273549;
+            --bg-base: #060913;
+            --bg-surface: rgba(15, 23, 42, 0.75);
+            --bg-surface-elevated: rgba(30, 41, 59, 0.8);
+            --bg-surface-hover: rgba(51, 65, 85, 0.8);
             --border-subtle: rgba(255, 255, 255, 0.08);
-            --border-focus: rgba(99, 102, 241, 0.5);
+            --border-glow: rgba(99, 102, 241, 0.4);
             
             --primary: #6366f1;
-            --primary-light: #818cf8;
-            --primary-glow: rgba(99, 102, 241, 0.25);
+            --primary-glow: rgba(99, 102, 241, 0.35);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.35);
+            --violet: #8b5cf6;
+            --violet-glow: rgba(139, 92, 246, 0.35);
             
             --success: #10b981;
-            --success-glow: rgba(16, 185, 129, 0.15);
+            --success-glow: rgba(16, 185, 129, 0.3);
             --danger: #f43f5e;
-            --danger-glow: rgba(244, 63, 94, 0.15);
+            --danger-glow: rgba(244, 63, 94, 0.35);
             --warning: #f59e0b;
             
             --text-primary: #f8fafc;
@@ -33,7 +36,7 @@
             
             --radius-sm: 8px;
             --radius-md: 12px;
-            --radius-lg: 16px;
+            --radius-lg: 18px;
             --radius-xl: 24px;
         }
 
@@ -41,7 +44,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
@@ -50,22 +53,79 @@
             min-height: 100vh;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.05) 0px, transparent 50%);
-            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* Top Navigation Bar */
+        /* Animated Ambient Light Orbs */
+        .ambient-orb-1 {
+            position: fixed;
+            top: -120px;
+            left: -120px;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(99, 102, 241, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(50px);
+            animation: orbFloat1 18s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb-2 {
+            position: fixed;
+            bottom: -150px;
+            right: -100px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, rgba(6, 182, 212, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(60px);
+            animation: orbFloat2 22s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb-3 {
+            position: fixed;
+            top: 40%;
+            right: 25%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, rgba(139, 92, 246, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(50px);
+            animation: orbFloat3 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes orbFloat1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(120px, 80px) scale(1.15); }
+        }
+
+        @keyframes orbFloat2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-100px, -90px) scale(1.2); }
+        }
+
+        @keyframes orbFloat3 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, -60px) scale(0.9); }
+        }
+
+        /* Top Sticky Glass Navigation */
         .navbar {
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(9, 13, 22, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(6, 9, 19, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-subtle);
-            padding: 14px 24px;
+            padding: 16px 24px;
+            transition: all 0.3s ease;
         }
 
         .nav-inner {
@@ -85,184 +145,248 @@
         }
 
         .brand-icon {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: var(--radius-md);
-            background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--cyan) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px var(--primary-glow);
+            box-shadow: 0 4px 20px var(--cyan-glow);
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover .brand-icon {
+            transform: rotate(-8deg) scale(1.08);
         }
 
         .brand-text {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(90deg, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
 
         .status-chip {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 12px;
+            padding: 6px 14px;
             background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.25);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 9999px;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--success);
+            box-shadow: 0 0 16px var(--success-glow);
         }
 
         .pulse-dot {
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: var(--success);
-            box-shadow: 0 0 8px var(--success);
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulseGlow 1.8s infinite;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
+        @keyframes pulseGlow {
+            0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px var(--success); }
+            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px var(--success); }
+            100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px var(--success); }
         }
 
         .btn-github {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
+            padding: 9px 18px;
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-md);
             color: var(--text-primary);
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
         }
 
         .btn-github:hover {
             background: var(--bg-surface-elevated);
-            border-color: var(--border-focus);
+            border-color: var(--border-glow);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
         }
 
-        /* Layout Container */
+        /* Main Workspace Container */
         .container {
             max-width: 1380px;
             margin: 0 auto;
-            padding: 32px 24px 80px;
+            padding: 36px 24px 80px;
+            position: relative;
+            z-index: 10;
         }
 
         /* Hero Header */
         .hero {
-            margin-bottom: 28px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
         }
 
         .hero h1 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 2.2rem;
-            font-weight: 800;
+            font-size: 2.6rem;
+            font-weight: 900;
             letter-spacing: -0.03em;
-            color: #ffffff;
-            margin-bottom: 6px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 45%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            line-height: 1.15;
         }
 
         .hero p {
             color: var(--text-secondary);
-            font-size: 1rem;
-            max-width: 650px;
+            font-size: 1.05rem;
+            max-width: 680px;
         }
 
-        /* Metrics Bar */
+        /* Top Metrics KPI Cards */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 32px;
         }
 
         .metric-card {
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
-            padding: 20px;
-            transition: border-color 0.2s ease;
+            padding: 22px 24px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .metric-card:hover {
-            border-color: var(--border-focus);
+            transform: translateY(-4px);
+            border-color: var(--border-glow);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--primary-glow);
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
         }
 
         .metric-label {
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 700;
             color: var(--text-tertiary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 6px;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
         }
 
         .metric-val {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1.7rem;
-            font-weight: 700;
+            font-size: 1.85rem;
+            font-weight: 800;
             color: var(--text-primary);
             display: flex;
             align-items: baseline;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .metric-sub {
-            font-size: 0.85rem;
-            color: var(--primary-light);
-            font-weight: 500;
+        .metric-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--cyan);
+            background: rgba(6, 182, 212, 0.12);
+            padding: 3px 8px;
+            border-radius: 6px;
         }
 
-        /* Navigation Tabs */
+        /* Modern Workspace Tabs */
         .tab-nav {
             display: flex;
-            gap: 8px;
-            border-bottom: 1px solid var(--border-subtle);
-            margin-bottom: 28px;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(14px);
+            padding: 6px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 30px;
             overflow-x: auto;
         }
 
         .tab-button {
+            flex: 1;
             padding: 12px 20px;
             background: transparent;
             border: none;
-            border-bottom: 2px solid transparent;
+            border-radius: var(--radius-md);
             color: var(--text-secondary);
             font-size: 0.95rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             white-space: nowrap;
+            text-align: center;
         }
 
         .tab-button:hover {
             color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .tab-button.active {
-            color: var(--primary-light);
-            border-bottom-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--violet) 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 18px var(--primary-glow);
         }
 
-        /* Studio Grid (Main Workspace) */
+        /* 2-Column Studio Grid */
         .studio-grid {
             display: grid;
-            grid-template-columns: 1.4fr 1fr;
+            grid-template-columns: 1.4fr 1.05fr;
             gap: 28px;
             align-items: start;
         }
@@ -273,13 +397,20 @@
             }
         }
 
-        /* Form / Config Panels */
+        /* Glass Input Panels */
         .panel {
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-xl);
             padding: 28px;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             margin-bottom: 24px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
         .panel-header {
@@ -292,10 +423,9 @@
         }
 
         .panel-title {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #ffffff;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -327,86 +457,99 @@
 
         label {
             font-size: 0.88rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: 700;
+            color: #cbd5e1;
         }
 
         .label-badge {
             font-size: 0.82rem;
             font-weight: 700;
-            color: var(--primary-light);
-            background: rgba(99, 102, 241, 0.12);
-            padding: 2px 8px;
-            border-radius: var(--radius-sm);
+            color: var(--cyan);
+            background: rgba(6, 182, 212, 0.14);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 2px 10px;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
         }
 
         select, input[type="text"] {
             width: 100%;
-            padding: 11px 14px;
+            padding: 12px 16px;
             background: var(--bg-surface-elevated);
-            border: 1px solid var(--border-subtle);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: var(--radius-md);
-            color: var(--text-primary);
-            font-size: 0.92rem;
+            color: #ffffff;
+            font-size: 0.93rem;
+            font-weight: 500;
             outline: none;
+            cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px var(--primary-glow);
+        select:focus, select:hover {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 2px var(--cyan-glow);
         }
 
-        /* Range Slider Styling */
+        /* Custom Range Slider with Dynamic Glow */
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: var(--bg-surface-elevated);
+            height: 7px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
             outline: none;
-            margin: 10px 0;
+            margin: 12px 0 6px;
+            transition: all 0.2s ease;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--cyan) 0%, var(--primary) 100%);
             cursor: pointer;
-            box-shadow: 0 2px 8px var(--primary-glow);
-            transition: transform 0.15s ease;
+            box-shadow: 0 0 14px var(--cyan-glow);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
         input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
+            transform: scale(1.25);
+            box-shadow: 0 0 20px var(--cyan);
         }
 
         /* Preset Chips */
         .preset-row {
             display: flex;
             gap: 8px;
-            margin-top: 8px;
+            margin-top: 10px;
             flex-wrap: wrap;
         }
 
         .chip-btn {
-            background: var(--bg-surface-elevated);
+            background: rgba(30, 41, 59, 0.6);
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 5px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 14px;
             border-radius: 9999px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .chip-btn:hover, .chip-btn.active {
-            background: var(--primary);
+        .chip-btn:hover {
+            background: var(--bg-surface-hover);
+            color: var(--text-primary);
+            border-color: var(--border-glow);
+        }
+
+        .chip-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--cyan) 100%);
             color: #ffffff;
-            border-color: var(--primary);
+            border-color: transparent;
+            box-shadow: 0 4px 14px var(--cyan-glow);
         }
 
         /* Segmented Buttons */
@@ -421,12 +564,12 @@
 
         .seg-btn {
             flex: 1;
-            padding: 8px 12px;
+            padding: 9px 12px;
             border: none;
             background: transparent;
             color: var(--text-secondary);
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.88rem;
+            font-weight: 700;
             border-radius: var(--radius-sm);
             cursor: pointer;
             transition: all 0.2s ease;
@@ -434,60 +577,87 @@
         }
 
         .seg-btn.active {
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(6, 182, 212, 0.4) 100%);
+            color: #ffffff;
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            box-shadow: 0 2px 10px var(--cyan-glow);
         }
 
-        /* Sticky Output Inspector */
+        /* Right Inspector Sticky Column */
         .inspector-col {
             position: sticky;
-            top: 86px;
+            top: 92px;
         }
 
+        /* Animated Verdict Box */
         .verdict-card {
             background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
+            border: 2px solid var(--border-subtle);
             border-radius: var(--radius-xl);
-            padding: 32px;
+            padding: 34px 28px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
             margin-bottom: 24px;
             position: relative;
             overflow: hidden;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .verdict-card.state-danger {
             border-color: var(--danger);
-            box-shadow: 0 12px 40px var(--danger-glow);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.5), 0 0 35px var(--danger-glow);
+            animation: pulseCardDanger 4s infinite alternate;
         }
 
         .verdict-card.state-safe {
             border-color: var(--success);
-            box-shadow: 0 12px 40px var(--success-glow);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.5), 0 0 35px var(--success-glow);
+            animation: pulseCardSafe 4s infinite alternate;
+        }
+
+        @keyframes pulseCardDanger {
+            0% { box-shadow: 0 15px 45px rgba(0,0,0,0.5), 0 0 25px var(--danger-glow); }
+            100% { box-shadow: 0 20px 55px rgba(0,0,0,0.5), 0 0 45px rgba(244, 63, 94, 0.5); }
+        }
+
+        @keyframes pulseCardSafe {
+            0% { box-shadow: 0 15px 45px rgba(0,0,0,0.5), 0 0 25px var(--success-glow); }
+            100% { box-shadow: 0 20px 55px rgba(0,0,0,0.5), 0 0 45px rgba(16, 185, 129, 0.45); }
         }
 
         .verdict-tag {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
             font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
+            font-weight: 800;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
-        .state-danger .verdict-tag { color: var(--danger); }
-        .state-safe .verdict-tag { color: var(--success); }
+        .state-danger .verdict-tag {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.4);
+            color: var(--danger);
+        }
 
-        /* Radial Progress Gauge */
+        .state-safe .verdict-tag {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: var(--success);
+        }
+
+        /* Radial Meter */
         .gauge-wrap {
             position: relative;
-            width: 170px;
-            height: 170px;
-            margin: 0 auto 16px;
+            width: 175px;
+            height: 175px;
+            margin: 0 auto 18px;
         }
 
         .gauge-svg {
@@ -498,17 +668,15 @@
 
         .gauge-bg {
             fill: none;
-            stroke: var(--bg-surface-elevated);
-            stroke-width: 12;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 13;
         }
 
         .gauge-meter {
             fill: none;
-            stroke-width: 12;
+            stroke-width: 13;
             stroke-linecap: round;
-            stroke-dasharray: 440;
-            stroke-dashoffset: 80;
-            transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease;
+            transition: stroke-dashoffset 0.7s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease, filter 0.4s ease;
         }
 
         .gauge-val-inner {
@@ -520,40 +688,42 @@
         }
 
         .gauge-val-num {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 2.3rem;
-            font-weight: 800;
-            color: var(--text-primary);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffffff;
             line-height: 1;
+            letter-spacing: -0.03em;
         }
 
         .gauge-val-sub {
             font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--text-tertiary);
+            font-weight: 700;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             margin-top: 4px;
         }
 
         .verdict-title {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1.35rem;
-            font-weight: 700;
-            margin-bottom: 6px;
+            font-size: 1.55rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
 
         .verdict-desc {
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             color: var(--text-secondary);
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            line-height: 1.5;
         }
 
         /* Probability Bars */
         .prob-section {
-            background: var(--bg-surface-elevated);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius-md);
-            padding: 16px;
+            padding: 16px 18px;
             margin-bottom: 20px;
             text-align: left;
         }
@@ -561,23 +731,23 @@
         .prob-bar-header {
             display: flex;
             justify-content: space-between;
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: 0.85rem;
+            font-weight: 700;
             margin-bottom: 6px;
         }
 
         .prob-bar-track {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 4px;
+            height: 9px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .prob-bar-fill {
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.4s ease;
+            border-radius: 5px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Risk Multiplier List */
@@ -587,15 +757,21 @@
             border-radius: var(--radius-xl);
             padding: 24px;
             text-align: left;
+            backdrop-filter: blur(16px);
         }
 
         .factor-item {
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            padding: 10px 0;
+            padding: 11px 0;
             border-bottom: 1px solid var(--border-subtle);
-            font-size: 0.88rem;
+            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+        }
+
+        .factor-item:hover {
+            transform: translateX(4px);
         }
 
         .factor-item:last-child {
@@ -604,28 +780,35 @@
         }
 
         .factor-icon {
-            font-size: 1rem;
-            margin-top: 2px;
+            font-size: 1.15rem;
+            margin-top: 1px;
         }
 
         .factor-text strong {
             color: var(--text-primary);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .factor-text span {
             color: var(--text-secondary);
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
+            margin-top: 2px;
         }
 
         /* Tab Panes */
         .tab-content {
             display: none;
+            animation: tabFadeIn 0.35s ease forwards;
         }
 
         .tab-content.active {
             display: block;
+        }
+
+        @keyframes tabFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Clean Data Tables */
@@ -638,20 +821,23 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             text-align: left;
         }
 
         th {
             background: var(--bg-surface-elevated);
-            padding: 14px 18px;
-            font-weight: 600;
+            padding: 16px 20px;
+            font-weight: 700;
             color: var(--text-secondary);
             border-bottom: 1px solid var(--border-subtle);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
         }
 
         td {
-            padding: 14px 18px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border-subtle);
             color: var(--text-primary);
         }
@@ -661,41 +847,46 @@
         }
 
         tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .table-badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
         }
 
-        .badge-red { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
-        .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-        .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-        .badge-blue { background: rgba(99, 102, 241, 0.15); color: var(--primary-light); }
+        .badge-red { background: rgba(244, 63, 94, 0.15); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.3); }
+        .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-blue { background: rgba(99, 102, 241, 0.15); color: var(--cyan); border: 1px solid rgba(99, 102, 241, 0.3); }
 
         /* Footer */
         footer {
-            margin-top: 60px;
-            padding-top: 24px;
+            margin-top: 70px;
+            padding-top: 28px;
             border-top: 1px solid var(--border-subtle);
             text-align: center;
             color: var(--text-tertiary);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
         }
     </style>
 </head>
 <body>
+
+    <!-- Ambient Glowing Orbs -->
+    <div class="ambient-orb-1"></div>
+    <div class="ambient-orb-2"></div>
+    <div class="ambient-orb-3"></div>
 
     <!-- Navigation Header -->
     <nav class="navbar">
         <div class="nav-inner">
             <a href="#" class="brand">
                 <div class="brand-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
                         <circle cx="7" cy="17" r="2"/>
                         <path d="M9 17h6"/>
@@ -721,6 +912,7 @@
     <div class="container">
         <!-- Hero Header -->
         <div class="hero">
+            <div class="hero-badge">⚡ Advanced ML & Geospatial Intelligence</div>
             <h1>Road Accident Severity Predictor</h1>
             <p>Real-time machine learning inference and geospatial intelligence for traffic incident injury prediction.</p>
         </div>
@@ -729,19 +921,19 @@
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-label">Balanced Accuracy</div>
-                <div class="metric-val">82.4% <span class="metric-sub">+14.2% vs Baseline</span></div>
+                <div class="metric-val">82.4% <span class="metric-badge">+14.2%</span></div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Macro F1 Score</div>
-                <div class="metric-val">0.801 <span class="metric-sub">SMOTE Balanced</span></div>
+                <div class="metric-val">0.801 <span class="metric-badge">SMOTE</span></div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Inference Latency</div>
-                <div class="metric-val">&lt; 8ms <span class="metric-sub">Real-time</span></div>
+                <div class="metric-val">&lt; 8ms <span class="metric-badge">Real-Time</span></div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">Geospatial Engine</div>
-                <div class="metric-val">DBSCAN <span class="metric-sub">Haversine Metric</span></div>
+                <div class="metric-label">Spatial Engine</div>
+                <div class="metric-val">DBSCAN <span class="metric-badge">Haversine</span></div>
             </div>
         </div>
 
@@ -750,19 +942,19 @@
             <button class="tab-button active" onclick="switchTab('studio')">Prediction Studio</button>
             <button class="tab-button" onclick="switchTab('shap')">SHAP Explainability</button>
             <button class="tab-button" onclick="switchTab('geo')">Geospatial Intelligence</button>
-            <button class="tab-button" onclick="switchTab('model')">Model Specifications</button>
+            <button class="tab-button" onclick="switchTab('model')">Model Architecture</button>
         </div>
 
         <!-- TAB 1: PREDICTION STUDIO -->
         <div id="tab-studio" class="tab-content active">
             <div class="studio-grid">
-                <!-- Left Column: Scenario Input Console -->
+                <!-- Left Column: Controls -->
                 <div class="controls-col">
                     <!-- Panel 1: Speed & Roadway -->
                     <div class="panel">
                         <div class="panel-header">
                             <h2 class="panel-title">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2.3"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
                                 Roadway & Speed Dynamics
                             </h2>
                             <span class="label-badge">Kinetic Multiplier</span>
@@ -806,10 +998,10 @@
                     <div class="panel">
                         <div class="panel-header">
                             <h2 class="panel-title">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2"><path d="M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.3"><path d="M20 16.2A4.5 4.5 0 0 0 17.5 8h-1.8A7 7 0 1 0 4 14.9"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>
                                 Environmental & Lighting Factors
                             </h2>
-                            <span class="label-badge">Visibility & Surface</span>
+                            <span class="label-badge">Visibility & Friction</span>
                         </div>
 
                         <div class="form-row-2">
@@ -858,10 +1050,10 @@
                     <div class="panel">
                         <div class="panel-header">
                             <h2 class="panel-title">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2.3"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                 Incident Characteristics
                             </h2>
-                            <span class="label-badge">Vehicle & Human Factors</span>
+                            <span class="label-badge">Vehicle & Damage</span>
                         </div>
 
                         <div class="form-row-2">
@@ -890,7 +1082,7 @@
                             <div class="form-group">
                                 <label for="cause">Primary Contributing Cause</label>
                                 <select id="cause" onchange="recompute()">
-                                    <option value="1" selected>Overspeeding / Red Light Running</option>
+                                    <option value="1" selected>Overspeeding / Disregarding Rules</option>
                                     <option value="2">Impaired Driving (Alcohol / Drugs)</option>
                                     <option value="3">Driver Distraction (Mobile Phone)</option>
                                     <option value="0">Failing to Yield / Bad Driving</option>
@@ -913,11 +1105,11 @@
                 <div class="inspector-col">
                     <div id="verdict-card" class="verdict-card state-danger">
                         <div class="verdict-tag" id="verdict-tag">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+                            <span class="pulse-dot" style="background: currentColor;"></span>
                             <span id="tag-text">High Severity Incident</span>
                         </div>
 
-                        <!-- Radial Meter -->
+                        <!-- Animated Radial Progress Meter -->
                         <div class="gauge-wrap">
                             <svg class="gauge-svg" viewBox="0 0 160 160">
                                 <circle class="gauge-bg" cx="80" cy="80" r="65"/>
@@ -929,36 +1121,36 @@
                             </div>
                         </div>
 
-                        <h3 class="verdict-title" id="verdict-title">Injury / Tow Required</h3>
+                        <h3 class="verdict-title" id="verdict-title" style="color: var(--danger);">Injury / Tow Required</h3>
                         <p class="verdict-desc" id="verdict-desc">High risk of passenger injury or disabling vehicle structural damage requiring immediate emergency towing.</p>
 
                         <!-- Probability Distribution Bars -->
                         <div class="prob-section">
                             <div class="prob-bar-header">
                                 <span style="color: var(--danger);">Injury & Tow Probability</span>
-                                <span id="val-p-injury" style="color: var(--danger); font-weight: 700;">84.2%</span>
+                                <span id="val-p-injury" style="color: var(--danger); font-weight: 800;">84.2%</span>
                             </div>
                             <div class="prob-bar-track">
-                                <div id="bar-injury" class="prob-bar-fill" style="width: 84.2%; background: var(--danger);"></div>
+                                <div id="bar-injury" class="prob-bar-fill" style="width: 84.2%; background: linear-gradient(90deg, #f43f5e, #fb7185); box-shadow: 0 0 10px var(--danger-glow);"></div>
                             </div>
 
                             <div class="prob-bar-header">
                                 <span style="color: var(--success);">No Injury / Drive Away</span>
-                                <span id="val-p-safe" style="color: var(--success); font-weight: 700;">15.8%</span>
+                                <span id="val-p-safe" style="color: var(--success); font-weight: 800;">15.8%</span>
                             </div>
                             <div class="prob-bar-track">
-                                <div id="bar-safe" class="prob-bar-fill" style="width: 15.8%; background: var(--success);"></div>
+                                <div id="bar-safe" class="prob-bar-fill" style="width: 15.8%; background: linear-gradient(90deg, #10b981, #34d399); box-shadow: 0 0 10px var(--success-glow);"></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Risk Multiplier Insights -->
                     <div class="factors-panel">
-                        <h4 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; color: var(--text-primary);">
-                            Identified Risk Multipliers
+                        <h4 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--warning);">⚠️</span> Identified Risk Factors
                         </h4>
                         <div id="risk-factor-list">
-                            <!-- Dynamic items injected here -->
+                            <!-- Injected dynamically -->
                         </div>
                     </div>
                 </div>
@@ -970,15 +1162,15 @@
             <div class="panel">
                 <div class="panel-header">
                     <div>
-                        <h2 class="panel-title">Global Feature Importance (SHAP Values)</h2>
-                        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
+                        <h2 class="panel-title">Global Feature Importance (SHAP TreeExplainer)</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">
                             Calculated via game-theoretic Shapley Additive Explanations across test validation splits.
                         </p>
                     </div>
                     <span class="label-badge">TreeExplainer</span>
                 </div>
 
-                <div id="chart-shap-clean" style="height: 420px; width: 100%;"></div>
+                <div id="chart-shap-clean" style="height: 440px; width: 100%;"></div>
             </div>
         </div>
 
@@ -988,7 +1180,7 @@
                 <div class="panel-header">
                     <div>
                         <h2 class="panel-title">Spatial Hotspot Analysis (Chicago DOT)</h2>
-                        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">
                             DBSCAN density clustering with Haversine distance and severity-weighted risk indices.
                         </p>
                     </div>
@@ -1011,35 +1203,35 @@
                                 <td>#C-01</td>
                                 <td><strong>60607</strong> (Loop / I-90 Junction)</td>
                                 <td>1,420 crashes</td>
-                                <td><strong>8.92</strong> / 10.0</td>
+                                <td><strong style="color: var(--danger);">8.92</strong> / 10.0</td>
                                 <td><span class="table-badge badge-red">Critical Priority</span></td>
                             </tr>
                             <tr>
                                 <td>#C-02</td>
                                 <td><strong>60616</strong> (Near South Side / Cermak)</td>
                                 <td>1,150 crashes</td>
-                                <td><strong>8.45</strong> / 10.0</td>
+                                <td><strong style="color: var(--danger);">8.45</strong> / 10.0</td>
                                 <td><span class="table-badge badge-red">Critical Priority</span></td>
                             </tr>
                             <tr>
                                 <td>#C-03</td>
                                 <td><strong>60618</strong> (Avondale / Elston Corridor)</td>
                                 <td>820 crashes</td>
-                                <td><strong>6.30</strong> / 10.0</td>
+                                <td><strong style="color: var(--warning);">6.30</strong> / 10.0</td>
                                 <td><span class="table-badge badge-amber">Elevated</span></td>
                             </tr>
                             <tr>
                                 <td>#C-04</td>
                                 <td><strong>60647</strong> (Logan Square / Fullerton)</td>
                                 <td>740 crashes</td>
-                                <td><strong>5.85</strong> / 10.0</td>
+                                <td><strong style="color: var(--warning);">5.85</strong> / 10.0</td>
                                 <td><span class="table-badge badge-amber">Elevated</span></td>
                             </tr>
                             <tr>
                                 <td>#C-05</td>
                                 <td><strong>60630</strong> (Jefferson Park)</td>
                                 <td>410 crashes</td>
-                                <td><strong>3.20</strong> / 10.0</td>
+                                <td><strong style="color: var(--success);">3.20</strong> / 10.0</td>
                                 <td><span class="table-badge badge-green">Standard Baseline</span></td>
                             </tr>
                         </tbody>
@@ -1048,13 +1240,13 @@
             </div>
         </div>
 
-        <!-- TAB 4: MODEL SPECIFICATIONS -->
+        <!-- TAB 4: MODEL ARCHITECTURE -->
         <div id="tab-model" class="tab-content">
             <div class="panel">
                 <div class="panel-header">
                     <div>
                         <h2 class="panel-title">Model Specifications & Benchmark Comparisons</h2>
-                        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">
                             Stratified 5-Fold cross-validation results comparing candidate architectures.
                         </p>
                     </div>
@@ -1074,12 +1266,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="background: rgba(99, 102, 241, 0.08);">
+                            <tr style="background: rgba(99, 102, 241, 0.12);">
                                 <td><strong>LightGBM Classifier</strong></td>
                                 <td>SMOTE (1:1 Ratio)</td>
-                                <td><strong>82.4%</strong></td>
-                                <td><strong>0.801</strong></td>
-                                <td><strong>0.875</strong></td>
+                                <td style="color: var(--cyan); font-weight: 800;">82.4%</td>
+                                <td style="color: var(--cyan); font-weight: 800;">0.801</td>
+                                <td style="color: var(--cyan); font-weight: 800;">0.875</td>
                                 <td><span class="table-badge badge-blue">Production Model</span></td>
                             </tr>
                             <tr>
@@ -1105,7 +1297,7 @@
         </div>
 
         <footer>
-            <p>Road Accident Severity Prediction • Built with LightGBM, SHAP, and Geospatial DBSCAN</p>
+            <p>Road Accident Severity Prediction • Built with LightGBM, SHAP Interpretability, and Geospatial DBSCAN</p>
         </footer>
     </div>
 
@@ -1147,6 +1339,28 @@
             if (tabId === 'shap') renderShapClean();
         }
 
+        let currentDisplayPercent = 84;
+        function animateCounter(target) {
+            const el = document.getElementById('gauge-percent');
+            const start = currentDisplayPercent;
+            const duration = 400;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.round(start + (target - start) * progress);
+                el.innerText = current + '%';
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    currentDisplayPercent = target;
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
         function recompute() {
             const speed = parseInt(document.getElementById('speed').value);
             const weather = parseInt(document.getElementById('weather').value);
@@ -1158,21 +1372,20 @@
             const cause = parseInt(document.getElementById('cause').value);
             const units = parseInt(document.getElementById('units').value);
 
-            // Calibrated scoring reflecting LightGBM SHAP feature importances
             let score = 20;
 
             // Speed factor
             score += ((speed - 15) / 60) * 25;
 
-            // Vehicle damage severity proxy
+            // Damage severity proxy
             if (damage === 2) score += 18;
             else if (damage === 1) score += 8;
 
-            // Multi-vehicle kinetic dispersion
+            // Vehicles involved
             if (units >= 3) score += 12;
             else if (units === 2) score += 5;
 
-            // High risk collision angles
+            // Collision angle
             if (crashtype === 3) score += 20; // Pedestrian
             else if (crashtype === 4) score += 18; // Head on / rollover
             else if (crashtype === 1) score += 8; // Rear end
@@ -1180,13 +1393,13 @@
             // Intersection
             if (isIntersection) score += 6;
 
-            // Primary cause behavior
-            if (cause === 1 || cause === 2) score += 10; // Speeding / alcohol
+            // Causes
+            if (cause === 1 || cause === 2) score += 10;
 
-            // Environmental traction & vision
+            // Environmental
             if (weather >= 1) score += 5;
             if (surface >= 1) score += 5;
-            if (lighting === 2) score += 6; // Unlit night
+            if (lighting === 2) score += 6;
             if (hour >= 22 || hour <= 4) score += 4;
 
             score = Math.min(Math.max(score, 6), 96);
@@ -1200,11 +1413,11 @@
             const title = document.getElementById('verdict-title');
             const desc = document.getElementById('verdict-desc');
             const gaugeMeter = document.getElementById('gauge-meter');
-            const gaugePercent = document.getElementById('gauge-percent');
 
             card.className = 'verdict-card ' + (isSevere ? 'state-danger' : 'state-safe');
             tagText.innerText = isSevere ? 'High Severity Incident' : 'Low Severity / Property Damage';
             title.innerText = isSevere ? 'Injury / Tow Required' : 'No Injury / Drive Away';
+            title.style.color = isSevere ? 'var(--danger)' : 'var(--success)';
             desc.innerText = isSevere 
                 ? 'High probability of severe occupant injury or disabling structural damage requiring emergency vehicle towing.' 
                 : 'Incident is classified as low kinetic impact; vehicles are driveable with no urgent medical response indicated.';
@@ -1215,7 +1428,10 @@
             gaugeMeter.style.strokeDasharray = circumference;
             gaugeMeter.style.strokeDashoffset = offset;
             gaugeMeter.style.stroke = isSevere ? 'var(--danger)' : 'var(--success)';
-            gaugePercent.innerText = pInjury.toFixed(0) + '%';
+            gaugeMeter.style.filter = isSevere ? 'drop-shadow(0 0 8px var(--danger))' : 'drop-shadow(0 0 8px var(--success))';
+
+            // Animate number
+            animateCounter(Math.round(pInjury));
 
             // Bars
             document.getElementById('val-p-injury').innerText = pInjury + '%';
@@ -1277,19 +1493,20 @@
                 y: shapFeatures.map(d => d.feature),
                 orientation: 'h',
                 marker: {
-                    color: '#6366f1',
-                    opacity: 0.85
+                    color: shapFeatures.map(d => d.val),
+                    colorscale: 'Blues',
+                    opacity: 0.9
                 },
                 text: shapFeatures.map(d => d.val.toFixed(1) + '%'),
                 textposition: 'auto',
-                textfont: { color: '#ffffff', size: 12 }
+                textfont: { color: '#ffffff', size: 12, family: 'Plus Jakarta Sans' }
             }];
 
             const layout = {
                 paper_bgcolor: 'rgba(0,0,0,0)',
                 plot_bgcolor: 'rgba(0,0,0,0)',
-                font: { color: '#94a3b8', family: 'Inter' },
-                margin: { l: 230, r: 30, t: 20, b: 40 },
+                font: { color: '#94a3b8', family: 'Plus Jakarta Sans' },
+                margin: { l: 240, r: 30, t: 20, b: 40 },
                 xaxis: { title: 'Mean |SHAP Value| Contribution (%)', gridcolor: 'rgba(255,255,255,0.06)' },
                 yaxis: { gridcolor: 'rgba(255,255,255,0.06)' }
             };

@@ -14,26 +14,25 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Refined Modern Enterprise Design System CSS
+# Refined Modern Enterprise Design System CSS with Glow & Animations
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
     
     * { 
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
     .stApp {
-        background-color: #090d16;
+        background-color: #060913;
         background-image: 
-            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.05) 0px, transparent 50%);
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
         color: #f8fafc;
     }
     
     /* Typography & Hierarchy */
     h1, h2, h3, h4 {
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
         letter-spacing: -0.02em;
     }
     
@@ -48,108 +47,125 @@ st.markdown("""
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
     
+    .app-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.2));
+        border: 1px solid rgba(6, 182, 212, 0.4);
+        border-radius: 9999px;
+        color: #06b6d4;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+    }
+
     .app-title {
-        font-size: 2.2rem;
-        font-weight: 800;
-        color: #ffffff;
-        margin-bottom: 0.3rem;
+        font-size: 2.6rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #06b6d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.4rem;
     }
     
     .app-subtitle {
         color: #94a3b8 !important;
-        font-size: 1rem;
+        font-size: 1.05rem;
     }
 
-    /* Metric Cards */
+    /* Metric Cards with Glowing Border */
     [data-testid="stMetric"] {
-        background: #0f172a;
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 14px;
-        padding: 16px 20px;
+        border-radius: 16px;
+        padding: 20px 24px;
+        transition: all 0.3s ease;
+    }
+
+    [data-testid="stMetric"]:hover {
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3), 0 0 15px rgba(99, 102, 241, 0.2);
     }
 
     [data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
-        font-weight: 700 !important;
+        font-size: 1.9rem !important;
+        font-weight: 800 !important;
         color: #ffffff !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
 
     [data-testid="stMetricLabel"] {
         color: #64748b !important;
-        font-size: 0.8rem !important;
-        font-weight: 600 !important;
+        font-size: 0.82rem !important;
+        font-weight: 700 !important;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
     }
 
     /* Section Panels */
     .clean-panel {
-        background: #0f172a;
+        background: rgba(15, 23, 42, 0.7);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 18px;
-        padding: 24px;
+        border-radius: 20px;
+        padding: 26px;
         margin-bottom: 20px;
+        backdrop-filter: blur(16px);
     }
 
-    .panel-heading {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #ffffff;
-        margin-bottom: 16px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    /* Verdict Banners */
+    /* Verdict Banners with Neon Glow */
     .verdict-box-danger {
-        background: linear-gradient(180deg, rgba(244, 63, 94, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%);
-        border: 1px solid rgba(244, 63, 94, 0.4);
-        border-radius: 18px;
-        padding: 24px;
+        background: linear-gradient(180deg, rgba(244, 63, 94, 0.15) 0%, rgba(15, 23, 42, 0.85) 100%);
+        border: 2px solid #f43f5e;
+        border-radius: 22px;
+        padding: 28px;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 22px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 30px rgba(244, 63, 94, 0.3);
     }
 
     .verdict-box-safe {
-        background: linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%);
-        border: 1px solid rgba(16, 185, 129, 0.4);
-        border-radius: 18px;
-        padding: 24px;
+        background: linear-gradient(180deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.85) 100%);
+        border: 2px solid #10b981;
+        border-radius: 22px;
+        padding: 28px;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 22px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 30px rgba(16, 185, 129, 0.3);
     }
 
     .verdict-title {
-        font-size: 1.5rem;
-        font-weight: 800;
+        font-size: 1.65rem;
+        font-weight: 900;
         margin: 8px 0;
-        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Primary Action Button */
+    /* Primary Action Button with Gradient */
     .stButton > button {
-        background: #4f46e5 !important;
+        background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%) !important;
         color: #ffffff !important;
         border: none !important;
-        border-radius: 12px !important;
-        padding: 14px 28px !important;
-        font-weight: 600 !important;
-        font-size: 0.95rem !important;
-        transition: all 0.2s ease !important;
+        border-radius: 14px !important;
+        padding: 16px 32px !important;
+        font-weight: 800 !important;
+        font-size: 1rem !important;
+        letter-spacing: 0.05em !important;
+        box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3) !important;
+        transition: all 0.3s ease !important;
         width: 100%;
     }
 
     .stButton > button:hover {
-        background: #4338ca !important;
-        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 25px rgba(6, 182, 212, 0.5) !important;
     }
 
     /* Inputs & Selectboxes */
     div[data-baseweb="select"] > div {
-        background-color: #1e293b !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 10px !important;
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 12px !important;
         color: #ffffff !important;
     }
 
@@ -159,26 +175,28 @@ st.markdown("""
 
     /* Clean Tabs */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background: transparent;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        padding-bottom: 4px;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 6px;
         margin-bottom: 24px;
     }
 
     .stTabs [data-baseweb="tab"] {
         background: transparent !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
         color: #94a3b8 !important;
         border: none !important;
-        padding: 10px 20px !important;
-        font-weight: 600 !important;
+        padding: 10px 22px !important;
+        font-weight: 700 !important;
         font-size: 0.95rem !important;
     }
 
     .stTabs [aria-selected="true"] {
-        background: #1e293b !important;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
         color: #ffffff !important;
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35) !important;
     }
 
     #MainMenu {visibility: hidden;}
@@ -278,6 +296,7 @@ def main():
     # Header Bar
     st.markdown("""
         <div class="app-header">
+            <span class="app-badge">⚡ Advanced ML & Geospatial Analytics</span>
             <h1 class="app-title">Road Accident Severity Predictor</h1>
             <p class="app-subtitle">Machine learning inference and geospatial intelligence for real-time traffic injury risk assessment.</p>
         </div>
@@ -292,7 +311,7 @@ def main():
     with kpi3:
         st.metric("ROC-AUC Score", "0.875", "Validation Set")
     with kpi4:
-        st.metric("Model Architecture", "LightGBM", "300 Estimators")
+        st.metric("Inference Engine", "LightGBM", "Real-Time Inference")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -370,14 +389,14 @@ def main():
                 report_type = st.selectbox("Police Report Status", report_options, index=1)
                 report_val = report_options.index(report_type)
 
-            compute_btn = st.button("Run Severity Inference", use_container_width=True)
+            compute_btn = st.button("RUN SEVERITY INFERENCE", use_container_width=True)
 
         with col_right:
             # Model Inference Calculation
             time_options = FEATURE_MAPPINGS['CRASH_TIME_OF_DAY']
-            time_val = 2 # Evening default
-            day_val = 5 # Friday default
-            month_val = 10 # October default
+            time_val = 2
+            day_val = 5
+            month_val = 10
             align_val = 0
             defect_val = 0
             device_val = 2
@@ -416,17 +435,17 @@ def main():
             is_injury = "INJURY" in predicted_class.upper() or "TOW" in predicted_class.upper()
             box_style = "verdict-box-danger" if is_injury else "verdict-box-safe"
             text_color = "#f43f5e" if is_injury else "#10b981"
-            verdict_badge = "CRITICAL SEVERITY" if is_injury else "LOW SEVERITY"
+            verdict_badge = "CRITICAL SEVERITY INCIDENT" if is_injury else "LOW SEVERITY / PROPERTY DAMAGE"
 
             st.markdown(f"""
                 <div class="{box_style}">
-                    <div style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; color: {text_color}; text-transform: uppercase;">
+                    <div style="font-size: 0.82rem; font-weight: 800; letter-spacing: 0.08em; color: {text_color}; text-transform: uppercase;">
                         ● {verdict_badge}
                     </div>
                     <div class="verdict-title" style="color: {text_color};">
                         {predicted_class}
                     </div>
-                    <div style="font-size: 1.1rem; color: #94a3b8; font-weight: 500;">
+                    <div style="font-size: 1.15rem; color: #94a3b8; font-weight: 600;">
                         Model Confidence: <strong style="color: #ffffff;">{confidence:.1f}%</strong>
                     </div>
                 </div>
@@ -452,7 +471,7 @@ def main():
             fig.update_layout(
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='#94a3b8', family='Inter'),
+                font=dict(color='#94a3b8', family='Plus Jakarta Sans'),
                 height=180,
                 margin=dict(l=10, r=20, t=10, b=10),
                 xaxis=dict(range=[0, 100], gridcolor='rgba(255,255,255,0.06)'),
@@ -484,13 +503,13 @@ def main():
             orientation="h",
             labels={"percent": "Mean SHAP Impact (%)", "feature": "Feature"},
             color="percent",
-            color_continuous_scale="Blues"
+            color_continuous_scale="Viridis"
         )
         fig_shap.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='#94a3b8', family='Inter'),
-            height=400,
+            font=dict(color='#94a3b8', family='Plus Jakarta Sans'),
+            height=420,
             yaxis=dict(autorange="reversed"),
             coloraxis_showscale=False
         )
