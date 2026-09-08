@@ -1,15 +1,23 @@
 # Road Accident Severity Prediction 🚗⚠️
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://sanya28wd.github.io/Road-Accident-Severity-Prediction/)
+[![Streamlit UI](https://img.shields.io/badge/Local%20App-Streamlit-ff4b4b?style=for-the-badge&logo=streamlit)](user_interface/app.py)
+[![Model](https://img.shields.io/badge/Model-LightGBM%20%2B%20SMOTE-blue?style=for-the-badge)](modelling/)
+
+🌐 **Live Web Application Demo:** [https://sanya28wd.github.io/Road-Accident-Severity-Prediction/](https://sanya28wd.github.io/Road-Accident-Severity-Prediction/)
+
 This repository contains our end-to-end **Road Accident Severity Prediction** project built as part of the Foundations of Data Science coursework. The goal of this project is to build a reliable machine learning pipeline that predicts the severity of a traffic crash and identifies high-risk areas using geospatial intelligence.
 
 **Key Features:**
-- 🤖 **Advanced ML Pipeline**: LightGBM classifier with SMOTE for imbalanced data
-- 📊 **Model Explainability**: SHAP and LIME interpretability analysis
-- 🗺️ **Geospatial Intelligence**: Hotspot detection and risk scoring
-- 🎨 **Interactive UI**: Streamlit web application for predictions
+- 🌐 **Interactive Web Demo**: Hosted on GitHub Pages with real-time severity calculator and Plotly charts
+- 🤖 **Advanced ML Pipeline**: LightGBM classifier with SMOTE for imbalanced data (82.4% Balanced Accuracy)
+- 📊 **Model Explainability**: SHAP and LIME interpretability analysis with global & local feature importance
+- 🗺️ **Geospatial Intelligence**: DBSCAN hotspot detection and risk scoring across Chicago postal areas
+- 🎨 **Modern Glassmorphic UI**: Streamlit application with custom interactive dashboards
 - 📈 **Comprehensive Reporting**: Visual dashboards and performance metrics
 
 ---
+
 
 ## Dataset
 
