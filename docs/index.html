@@ -921,11 +921,11 @@
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-label">Balanced Accuracy</div>
-                <div class="metric-val">82.4% <span class="metric-badge">+14.2%</span></div>
+                <div class="metric-val">79.9% <span class="metric-badge">Held-Out Test</span></div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Macro F1 Score</div>
-                <div class="metric-val">0.801 <span class="metric-badge">SMOTE</span></div>
+                <div class="metric-val">0.806 <span class="metric-badge">LightGBM</span></div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Inference Latency</div>
@@ -1247,7 +1247,7 @@
                     <div>
                         <h2 class="panel-title">Model Specifications & Benchmark Comparisons</h2>
                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">
-                            Stratified 5-Fold cross-validation results comparing candidate architectures.
+                            Stratified 5-fold cross-validation means (<code>modelling/reports/cv_results.csv</code>). LightGBM held-out test: 79.9% balanced accuracy, 0.806 macro F1.
                         </p>
                     </div>
                     <span class="label-badge">LightGBM v4.7</span>
@@ -1258,36 +1258,46 @@
                         <thead>
                             <tr>
                                 <th>Algorithm Candidate</th>
-                                <th>Sampling Technique</th>
+                                <th>Imbalance Handling</th>
                                 <th>Balanced Accuracy</th>
                                 <th>Macro F1</th>
-                                <th>ROC-AUC</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr style="background: rgba(99, 102, 241, 0.12);">
                                 <td><strong>LightGBM Classifier</strong></td>
-                                <td>SMOTE (1:1 Ratio)</td>
-                                <td style="color: var(--cyan); font-weight: 800;">82.4%</td>
-                                <td style="color: var(--cyan); font-weight: 800;">0.801</td>
-                                <td style="color: var(--cyan); font-weight: 800;">0.875</td>
+                                <td>None (raw class ratio)</td>
+                                <td style="color: var(--cyan); font-weight: 800;">79.7%</td>
+                                <td style="color: var(--cyan); font-weight: 800;">0.804</td>
                                 <td><span class="table-badge badge-blue">Production Model</span></td>
                             </tr>
                             <tr>
-                                <td>Random Forest (100 Trees)</td>
-                                <td>Random Undersampling</td>
-                                <td>74.1%</td>
-                                <td>0.713</td>
-                                <td>0.790</td>
+                                <td>XGBoost Classifier</td>
+                                <td>None (raw class ratio)</td>
+                                <td>79.6%</td>
+                                <td>0.804</td>
                                 <td><span class="table-badge badge-amber">Evaluated</span></td>
                             </tr>
                             <tr>
+                                <td>Extra Trees (400 Trees)</td>
+                                <td>Balanced class weights</td>
+                                <td>77.0%</td>
+                                <td>0.781</td>
+                                <td><span class="table-badge badge-amber">Evaluated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Logistic Regression + SMOTE</td>
+                                <td>SMOTE oversampling</td>
+                                <td>78.5%</td>
+                                <td>0.743</td>
+                                <td><span class="table-badge badge-amber">Baseline</span></td>
+                            </tr>
+                            <tr>
                                 <td>Logistic Regression</td>
-                                <td>Class Weight Balanced</td>
-                                <td>68.2%</td>
-                                <td>0.650</td>
-                                <td>0.722</td>
+                                <td>Balanced class weights</td>
+                                <td>78.5%</td>
+                                <td>0.741</td>
                                 <td><span class="table-badge badge-amber">Baseline</span></td>
                             </tr>
                         </tbody>
